@@ -1,4 +1,3 @@
-import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -21,3 +20,12 @@ function App() {
 }
 
 export default App;
+
+// function App() {
+//   return (
+//     <div className="text-2xl font-bold text-blue-600 p-8">
+//       Tailwind is working! 🎉
+//     </div>
+//   );
+// }
+// export default App;

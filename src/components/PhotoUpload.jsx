@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { storage } from "../services/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { v4 as uuidv4 } from "uuid";
 
 const PhotoUpload = () => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [downloadURL, setDownloadURL] = useState("");
+  const [imageURL, setImageURL] = useState("");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -19,11 +16,18 @@ const PhotoUpload = () => {
     if (!image) return;
 
     setUploading(true);
-    const storageRef = ref(storage, `photos/${uuidv4()}`);
-    await uploadBytes(storageRef, image);
 
-    const url = await getDownloadURL(storageRef);
-    setDownloadURL(url);
+    const formData = new FormData();
+    formData.append("file", image);
+    formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setImageURL(data.secure_url);
     setUploading(false);
   };
 
@@ -49,9 +53,9 @@ const PhotoUpload = () => {
         {uploading ? "Uploading..." : "Upload"}
       </button>
 
-      {downloadURL && (
+      {imageURL && (
         <p className="mt-4 text-green-600 text-sm break-all">
-          Uploaded: <a href={downloadURL} target="_blank" rel="noreferrer">{downloadURL}</a>
+          Uploaded: <a href={imageURL} target="_blank" rel="noreferrer">{imageURL}</a>
         </p>
       )}
     </div>
